@@ -3,6 +3,7 @@ package jade;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+import util.Time;
 
 import java.util.Objects;
 
@@ -16,11 +17,14 @@ public class Window {
     private String title;
     private long glfwWindow;
 
-    private float r,g,b,a;
-    private boolean fadeToBlack;
+    public float r,g,b,a;
+
 
     // Static window so only one remains at any time
     private static Window window = null;
+
+    // Scene
+    private static Scene currentScene;
 
     private Window(){
         this.height = 1080;
@@ -31,11 +35,22 @@ public class Window {
         g = 1;
         a = 1;
 
-        // Not required later. Should remove
-        // RMVCODE
-        //HERE
-        fadeToBlack = false;
-        // To Here
+
+    }
+
+    public static void changeScene(int newScene){
+        switch(newScene){
+            case 0:
+                currentScene = new LevelEditorScene();
+                // currentScnene.init();
+                break;
+            case 1:
+                currentScene = new LevelScene();
+                break;
+            default:
+                assert false : "Unknown scene " + newScene;
+                break;
+        }
     }
 
     public static Window get(){
@@ -105,9 +120,17 @@ public class Window {
 
         // If this is not present then it may break the project
         GL.createCapabilities();
+
+        // initalise scene
+        Window.changeScene(0);
     }
 
     public void loop(){
+        // initalise begin time
+        float beginTime = Time.getTime();
+        float endTime = Time.getTime();
+        float dt = -1.0f;
+
         while(!glfwWindowShouldClose(glfwWindow)){
             // Poll Events
             glfwPollEvents();
@@ -115,23 +138,16 @@ public class Window {
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            // Fade to black logic. Not required later
-            // RMVCODE
-            // Here-
-            fadeToBlack = KeyListener.isKeyPressed(GLFW_KEY_SPACE);
-
-            if(fadeToBlack){
-                r = Math.max(r-0.1f,0);
-                g = Math.max(g-0.1f,0);
-                b = Math.max(b-0.1f,0);
-            }else{
-                r = Math.min(r+0.1f,1);
-                g = Math.min(g+0.1f,1);
-                b = Math.min(b+0.1f,1);
+            if(dt>=0){
+                currentScene.update(dt);
             }
-            // to here
+
             glfwSwapBuffers(glfwWindow);
 
+            // Update time variables
+            endTime = Time.getTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
         }
     }
 
