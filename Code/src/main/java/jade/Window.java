@@ -4,6 +4,9 @@ import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
+import java.util.Objects;
+
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -13,6 +16,8 @@ public class Window {
     private String title;
     private long glfwWindow;
 
+    private float r,g,b,a;
+
     // Static window so only one remains at any time
     private static Window window = null;
 
@@ -20,6 +25,10 @@ public class Window {
         this.height = 1080;
         this.width = 1920;
         this.title = "Mario";
+        r = 1;
+        b = 1;
+        g = 1;
+        a = 1;
     }
 
     public static Window get(){
@@ -34,6 +43,15 @@ public class Window {
 
         init();
         loop();
+
+        // Free the memory
+        glfwFreeCallbacks(glfwWindow);
+        glfwDestroyWindow(glfwWindow);
+
+        // Terminate GLFW and free the error
+        glfwTerminate();
+        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
+
     }
 
     public void init(){
@@ -56,6 +74,12 @@ public class Window {
         if(glfwWindow == NULL){
             throw new IllegalStateException("Unable to create GLFW Window");
         }
+
+        // Listeners
+        glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
+        glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+        glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+        glfwSetKeyCallback(glfwWindow, KeyListener::keyCallBack);
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(glfwWindow);
@@ -81,8 +105,12 @@ public class Window {
             // Poll Events
             glfwPollEvents();
 
-            glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+            glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
+
+            if(KeyListener.isKeyPressed(GLFW_KEY_SPACE)){
+                System.out.println("Space Key is pressed ");
+            }
 
             glfwSwapBuffers(glfwWindow);
 
