@@ -30,7 +30,12 @@ public class Window {
         b = 1;
         g = 1;
         a = 1;
+
+        // Not required later. Should remove
+        // RMVCODE
+        //HERE
         fadeToBlack = false;
+        // To Here
     }
 
     public static Window get(){
@@ -110,6 +115,9 @@ public class Window {
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
 
+            // Fade to black logic. Not required later
+            // RMVCODE
+            // Here-
             fadeToBlack = KeyListener.isKeyPressed(GLFW_KEY_SPACE);
 
             if(fadeToBlack){
@@ -121,7 +129,7 @@ public class Window {
                 g = Math.min(g+0.1f,1);
                 b = Math.min(b+0.1f,1);
             }
-
+            // to here
             glfwSwapBuffers(glfwWindow);
 
         }
