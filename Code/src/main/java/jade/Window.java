@@ -17,6 +17,7 @@ public class Window {
     private long glfwWindow;
 
     private float r,g,b,a;
+    private boolean fadeToBlack;
 
     // Static window so only one remains at any time
     private static Window window = null;
@@ -29,6 +30,7 @@ public class Window {
         b = 1;
         g = 1;
         a = 1;
+        fadeToBlack = false;
     }
 
     public static Window get(){
@@ -108,8 +110,16 @@ public class Window {
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            if(KeyListener.isKeyPressed(GLFW_KEY_SPACE)){
-                System.out.println("Space Key is pressed ");
+            fadeToBlack = KeyListener.isKeyPressed(GLFW_KEY_SPACE);
+
+            if(fadeToBlack){
+                r = Math.max(r-0.1f,0);
+                g = Math.max(g-0.1f,0);
+                b = Math.max(b-0.1f,0);
+            }else{
+                r = Math.min(r+0.1f,1);
+                g = Math.min(g+0.1f,1);
+                b = Math.min(b+0.1f,1);
             }
 
             glfwSwapBuffers(glfwWindow);
