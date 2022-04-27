@@ -1,5 +1,6 @@
 package jade;
 
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.Shader;
 
@@ -11,39 +12,39 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 public class LevelEditorScene extends Scene{
-    private String vertexShaderSrc = "#version 330 core\n" +
-            "\n" +
-            "//vecN is N sized vector\n" +
-            "in vec3 aPos;\n" +
-            "in vec4 aColor;\n" +
-            "\n" +
-            "// Output\n" +
-            "out vec4 fColor;\n" +
-            "\n" +
-            "void main(){\n" +
-            "    fColor = aColor;\n" +
-            "    gl_Position = vec4(aPos, 1.0);\n" +
-            "}";
-
-    private String fragmentShaderSrc = "#version 330 core\n" +
-            "\n" +
-            "in vec4 fColor;\n" +
-            "\n" +
-            "out vec4 color;\n" +
-            "\n" +
-            "void main(){\n" +
-            "    color = fColor;\n" +
-            "}";
+//    private String vertexShaderSrc = "#version 330 core\n" +
+//            "\n" +
+//            "//vecN is N sized vector\n" +
+//            "in vec3 aPos;\n" +
+//            "in vec4 aColor;\n" +
+//            "\n" +
+//            "// Output\n" +
+//            "out vec4 fColor;\n" +
+//            "\n" +
+//            "void main(){\n" +
+//            "    fColor = aColor;\n" +
+//            "    gl_Position = vec4(aPos, 1.0);\n" +
+//            "}";
+//
+//    private String fragmentShaderSrc = "#version 330 core\n" +
+//            "\n" +
+//            "in vec4 fColor;\n" +
+//            "\n" +
+//            "out vec4 color;\n" +
+//            "\n" +
+//            "void main(){\n" +
+//            "    color = fColor;\n" +
+//            "}";
 
     private int vertexID, fragmentID, shaderProgram;
 
     // positions are normalised
     private float[] vertexArray = {
         // position             // color
-         0.5f, -0.5f, 0.0f,      1.0f, 0.0f, 0.0f, 1.0f,  // 0: Bottom right
-        -0.5f,  0.5f, 0.0f,      0.0f, 1.0f, 0.0f, 1.0f,  // 1: Top left
-         0.5f,  0.5f, 0.0f,      0.0f, 0.0f, 1.0f, 1.0f,  // 2: Top Right
-        -0.5f, -0.5f, 0.0f,      1.0f, 1.0f, 0.0f, 1.0f,  // 3: Bottom left
+         200.5f, 100.5f, 0.0f,      1.0f, 0.0f, 0.0f, 1.0f,  // 0: Bottom right
+        100.5f,  200.5f, 0.0f,      0.0f, 1.0f, 0.0f, 1.0f,  // 1: Top left
+         200.5f,  200.5f, 0.0f,      0.0f, 0.0f, 1.0f, 1.0f,  // 2: Top Right
+        100.5f, 100.5f, 0.0f,      1.0f, 1.0f, 0.0f, 1.0f,  // 3: Bottom left
     };
 
     // IMPORTANT: Must be in counter-clockwise order
@@ -73,6 +74,7 @@ public class LevelEditorScene extends Scene{
 
     @Override
     public void init(){
+        this.camera = new Camera(new Vector2f());
         defaultShader = new Shader("./assets/shaders/default.glsl");
         defaultShader.compile();
 
@@ -126,6 +128,8 @@ public class LevelEditorScene extends Scene{
     public void update(float dt) {
 
         defaultShader.use();
+        defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
+        defaultShader.uploadMat4f("uView", camera.getViewMatrix());
         //Bind the VAO that we are using
         glBindVertexArray(vaoID);
 
